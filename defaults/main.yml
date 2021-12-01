@@ -1,0 +1,11 @@
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smartindent nu ft=yaml
+---
+
+opn_update_desired_version: false
+opn_update_force: false
+
+# time in seconds we should wait for a reboot
+# FIXME: in fact this should depend on the type of the update (major vs. minor)
+opn_update_wait_for_reboot: 1800
+
+...

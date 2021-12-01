@@ -1,0 +1,35 @@
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smartindent nu ft=yaml
+---
+
+- name: check facts ... real facts and not alternative one!
+  fail:
+    msg: "role requires ansible-opnsense-facts"
+  when: ansible_local.opnsense.core.product_version is not defined
+
+- name: decide if we should run a update
+  set_fact:
+    _opn_update_required: "{{ opn_update_desired_version|bool and opn_update_desired_version is version_compare(ansible_local.opnsense.core.product_version, '>') or opn_update_force|bool }}"
+
+- debug:
+    var: ansible_local.opnsense.core.product_version
+    verbosity: 1
+- debug:
+    var: _opn_update_required
+    verbosity: 1
+
+# FIXME: if the script reboots the fw, we get a
+# fatal: UNREACHABLE! => {"changed": false, "msg": "Mitogen was disconnected from the remote environment while a call was in-progress. If you feel this is in error, please file a bug. Original error was: the respondent Context has disconnected", "unreachable": true}
+# or
+# fatal: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"127.0.0.1\". Make sure this host can be reached over ssh: ", "unreachable": true}
+- name: run update
+  command: /usr/local/etc/rc.firmware
+  when: _opn_update_required|bool
+
+- name: wait for opnsense firewall to come up ...
+  wait_for_connection:
+    delay: 60 # FIXME: delay should be depending on the reboot required state from /usr/local/etc/rc.firmware
+    sleep: 15
+    timeout: "{{ opn_update_wait_for_reboot }}"
+  when: _opn_update_required|bool
+
+...

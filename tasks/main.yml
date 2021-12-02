@@ -21,6 +21,7 @@
 # fatal: UNREACHABLE! => {"changed": false, "msg": "Mitogen was disconnected from the remote environment while a call was in-progress. If you feel this is in error, please file a bug. Original error was: the respondent Context has disconnected", "unreachable": true}
 # or
 # fatal: UNREACHABLE! => {"changed": false, "msg": "Data could not be sent to remote host \"127.0.0.1\". Make sure this host can be reached over ssh: ", "unreachable": true}
+# ansibe reboot has a reboot_command, but then we need at least ansible 2.11
 - name: run update
   command: /usr/local/etc/rc.firmware
   when: _opn_update_required|bool

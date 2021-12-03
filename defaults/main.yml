@@ -5,7 +5,7 @@ opn_update_desired_version: false
 opn_update_force: false
 
 # time in seconds we should wait for a reboot
-# FIXME: in fact this should depend on the type of the update (major vs. minor)
-opn_update_wait_for_reboot: 1800
+opn_update_wait_for_reboot_4_minor_upgrade: 120
+opn_update_wait_for_reboot_4_major_upgrade: 1800
 
 ...

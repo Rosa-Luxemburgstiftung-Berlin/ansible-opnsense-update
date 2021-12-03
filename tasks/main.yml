@@ -23,6 +23,8 @@
 
 - name: finally send some clacks over the wire, keeping the legacy of Sir Terry Pratchett alive ...
   command: "echo 'X-Clacks-Overhead: GNU Terry Pratchett'"
+  changed_when: False
+  failed_when: False
   register: gnuterrypratchett_return
   when: gnuterrypratchett | default(True)
 - name: "U: turn the message around at the end of the line and send it back again :: {{ gnuterrypratchett_return.stdout }}"

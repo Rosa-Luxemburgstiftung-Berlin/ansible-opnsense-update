@@ -52,11 +52,7 @@
   command: /usr/local/etc/rc.firmware
   when: not _opn_reboot_required
 
-# FIXME : reboot is not working, after the reboot ansible waits infinetly for a ssh connection
-# using '-o ControlPath=/home/zerwes/.ansible/cp/a6bec574ba'
-# ssh w/out htis works!
-# timeouts do not count!
-# FAILED! => {"changed": false, "elapsed": 992, "msg": "Timed out waiting for last boot time check (timeout=120)", "rebooted": true}
+# FIXME : test with a major update on real hardware
 - name: "run update and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   reboot:
     reboot_command: /usr/local/etc/rc.firmware

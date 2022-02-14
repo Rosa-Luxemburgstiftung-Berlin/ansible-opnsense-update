@@ -12,27 +12,32 @@
 
 - name: check if update requires a reboot
   command: /usr/local/opnsense/scripts/firmware/reboot.sh
-  changed_when: False
-  failed_when: False
+  changed_when: false
+  failed_when: false
   register: _opn_check_reboot_required
 
 - name: register reboot required status
   set_fact:
     _opn_reboot_required: "{{ not (_opn_check_reboot_required.rc | bool) }}"
 
-- debug:
+- name: debug ansible_local.opnsense.core.product_version
+  debug:
     var: ansible_local.opnsense.core.product_version
     verbosity: 1
-- debug:
+- name: debug _opn_check_major_update
+  debug:
     var: _opn_check_major_update
     verbosity: 2
-- debug:
+- name: debug _opn_major_update
+  debug:
     var: _opn_major_update
     verbosity: 1
-- debug:
+- name: debug _opn_check_reboot_required
+  debug:
     var: _opn_check_reboot_required
     verbosity: 2
-- debug:
+- name: debug _opn_reboot_required
+  debug:
     var: _opn_reboot_required
     verbosity: 1
 
@@ -42,7 +47,12 @@
 
 - name: set reboot_timeout ...
   set_fact:
-    _opn_reboot_timeout: "{% if _opn_major_update %}{{ opn_update_wait_for_reboot_4_major_upgrade }}{% else %}{{ opn_update_wait_for_reboot_4_minor_upgrade }}{% endif %}"
+    _opn_reboot_timeout: "
+      {% if _opn_major_update %}
+        {{ opn_update_wait_for_reboot_4_major_upgrade }}
+      {% else %}
+        {{ opn_update_wait_for_reboot_4_minor_upgrade }}
+      {% endif %}"
   when: _opn_reboot_required
 
 # FIXME implement the pinned upgrade to e specific version unsing

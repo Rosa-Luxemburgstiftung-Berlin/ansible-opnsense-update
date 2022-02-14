@@ -15,7 +15,11 @@
 
 - name: decide if we should run a update
   set_fact:
-    _opn_update_required: "{{ opn_update_desired_version|bool and opn_update_desired_version is version_compare(ansible_local.opnsense.core.product_version, '>') or opn_update_force|bool }}"
+    _opn_update_required: "{{
+      opn_update_desired_version|bool
+      and opn_update_desired_version is version_compare(ansible_local.opnsense.core.product_version, '>')
+      or opn_update_force|bool
+      }}"
 
 - name: prepare update ...
   include_tasks: update.yml
@@ -23,14 +27,14 @@
 
 - name: finally send some clacks over the wire, keeping the legacy of Sir Terry Pratchett alive ...
   command: "echo 'X-Clacks-Overhead: GNU Terry Pratchett'"
-  changed_when: False
-  failed_when: False
+  changed_when: false
+  failed_when: false
   register: gnuterrypratchett_return
-  when: gnuterrypratchett | default(True)
+  when: gnuterrypratchett | default(true)
 - name: "U: turn the message around at the end of the line and send it back again :: {{ gnuterrypratchett_return.stdout }}"
   debug:
     var: gnuterrypratchett_return.stdout
     verbosity: 1
-  when: gnuterrypratchett | default(True)
+  when: gnuterrypratchett | default(true)
 
 ...

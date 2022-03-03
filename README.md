@@ -7,3 +7,29 @@ perform a firmware update for opnsense via ansible
 ## Role Variables
 
 [defaults/main.yml](defaults/main.yml)
+
+## Example
+
+### Sample Playbook
+
+```yaml
+- name: opnsense
+  hosts: opnsense
+  vars:
+    ansible_become: false
+  roles:
+    - role: opnsense-facts
+      tags:
+        - opnsense
+        - facts
+    - role: opnsense-update
+      tags:
+        - opnsense
+        - update
+```
+
+### Run
+
+```
+ansible-playbook -v -e opn_update_desired_version=22.1 -e opn_update_force=true -l opnsense -D firewalls.yml
+```

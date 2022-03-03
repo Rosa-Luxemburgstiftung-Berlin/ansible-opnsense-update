@@ -1,7 +1,8 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smartindent nu ft=yaml
 ---
 
-opn_update_desired_version: false
+# define this for a fixed version
+# opn_update_desired_version: false
 opn_update_force: false
 
 # time in seconds we should wait for a reboot

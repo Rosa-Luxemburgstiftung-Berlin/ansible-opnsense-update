@@ -13,10 +13,20 @@
     msg: "role requires ansible-opnsense-facts"
   when: ansible_local.opnsense.core.product_version is not defined
 
+- name: ansible_local.opnsense.core.product_version
+  debug:
+    var: ansible_local.opnsense.core.product_version
+    verbosity: 1
+
+- name: opn_update_desired_version
+  debug:
+    var: opn_update_desired_version
+    verbosity: 1
+
 - name: decide if we should run a update
   set_fact:
     _opn_update_required: "{{
-      opn_update_desired_version|bool
+      opn_update_desired_version is defined
       and opn_update_desired_version is version_compare(ansible_local.opnsense.core.product_version, '>')
       or opn_update_force|bool
       }}"

@@ -11,16 +11,34 @@
   set_fact:
     _opn_major_update: "{% if _opn_check_major_update.stdout | length > 0 %}true{% else %}false{% endif %}"
 
+- name: register desired base version
+  set_fact:
+    _opn_update_desired_base: "{{ opn_update_desired_version | split('.') }}"
+
+- name: register major update status based on _opn_update_desired_base
+  set_fact:
+    _opn_major_update: true
+  when:
+    - not _opn_major_update
+    - _opn_update_desired_base[0] ~ '.' ~ _opn_update_desired_base[1] is version_compare(ansible_local.opnsense.core.product_series, '>')
+
+- name: major update require a reboot
+  set_fact:
+    _opn_major_update: true
+  when: _opn_major_update
+
 - name: check if update requires a reboot
   command: /usr/local/opnsense/scripts/firmware/reboot.sh
   changed_when: false
   failed_when: false
   check_mode: no
   register: _opn_check_reboot_required
+  when: not _opn_major_update
 
 - name: register reboot required status
   set_fact:
     _opn_reboot_required: "{{ not (_opn_check_reboot_required.rc | bool) }}"
+  when: not _opn_major_update
 
 - name: debug ansible_local.opnsense.core.product_version
   debug:
@@ -29,7 +47,7 @@
 - name: debug _opn_check_major_update
   debug:
     var: _opn_check_major_update
-    verbosity: 2
+    verbosity: 1
 - name: debug _opn_major_update
   debug:
     var: _opn_major_update
@@ -37,7 +55,7 @@
 - name: debug _opn_check_reboot_required
   debug:
     var: _opn_check_reboot_required
-    verbosity: 2
+    verbosity: 1
 - name: debug _opn_reboot_required
   debug:
     var: _opn_reboot_required
@@ -57,20 +75,27 @@
       {%- endif -%}"
   when: _opn_reboot_required
 
-# FIXME implement the pinned upgrade to e specific version unsing
-#   /usr/local/etc/rc.firmware upgrade VERSION
-
 - name: run update
   command: /usr/local/etc/rc.firmware
   when: not _opn_reboot_required
 
-# FIXME : test with a major update on real hardware
 - name: "run update and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   reboot:
     reboot_command: /usr/local/etc/rc.firmware
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
-  when: _opn_reboot_required
+  when:
+    - _opn_reboot_required
+    - not _opn_major_update
+
+- name: "run upgrade and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
+  reboot:
+    reboot_command: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
+    reboot_timeout: "{{ _opn_reboot_timeout }}"
+    connect_timeout: 20
+  when:
+    - _opn_reboot_required
+    - _opn_major_update
 
 - name: reload ansible_local facts
   setup:

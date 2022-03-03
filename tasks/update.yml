@@ -4,6 +4,7 @@
 - name: check if this is a major update
   command: opnsense-update -vR
   changed_when: false
+  check_mode: no
   register: _opn_check_major_update
 
 - name: register major update status
@@ -14,6 +15,7 @@
   command: /usr/local/opnsense/scripts/firmware/reboot.sh
   changed_when: false
   failed_when: false
+  check_mode: no
   register: _opn_check_reboot_required
 
 - name: register reboot required status
@@ -48,11 +50,11 @@
 - name: set reboot_timeout ...
   set_fact:
     _opn_reboot_timeout: "
-      {% if _opn_major_update %}
+      {%- if _opn_major_update -%}
         {{ opn_update_wait_for_reboot_4_major_upgrade }}
-      {% else %}
+      {%- else -%}
         {{ opn_update_wait_for_reboot_4_minor_upgrade }}
-      {% endif %}"
+      {%- endif -%}"
   when: _opn_reboot_required
 
 # FIXME implement the pinned upgrade to e specific version unsing

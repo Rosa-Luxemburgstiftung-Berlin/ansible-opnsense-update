@@ -7,10 +7,6 @@
   check_mode: false
   register: _opn_check_major_update
 
-- name: register major update status
-  set_fact:
-    _opn_major_update: "{% if _opn_check_major_update.stdout | length > 0 %}true{% else %}false{% endif %}"
-
 - name: register desired base version
   set_fact:
     _opn_update_desired_base: "{{ opn_update_desired_version | split('.') }}"
@@ -19,8 +15,13 @@
   set_fact:
     _opn_major_update: true
   when:
-    - not _opn_major_update
-    - _opn_update_desired_base[0] ~ '.' ~ _opn_update_desired_base[1] is version_compare(ansible_local.opnsense.core.product_series, '>')
+    - (_opn_update_desired_base[0] ~ '.' ~ _opn_update_desired_base[1]) is version_compare(ansible_local.opnsense.core.product_series, '>')
+
+- name: register major update status
+  set_fact:
+    _opn_major_update: "{% if _opn_check_major_update.stdout | length > 0 %}true{% else %}false{% endif %}"
+  when:
+    - _opn_major_update is undefined or not _opn_major_update
 
 - name: major update require a reboot
   set_fact:
@@ -87,6 +88,11 @@
   when:
     - _opn_reboot_required
     - not _opn_major_update
+
+- name: debug reboot_command
+  debug:
+    msg: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
+    verbosity: 1
 
 - name: "run upgrade and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   reboot:

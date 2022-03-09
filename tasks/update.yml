@@ -24,7 +24,7 @@
 
 - name: major update require a reboot
   set_fact:
-    _opn_major_update: true
+    _opn_check_reboot_required: true
   when: _opn_major_update
 
 - name: check if update requires a reboot

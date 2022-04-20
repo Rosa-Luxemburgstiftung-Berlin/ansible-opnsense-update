@@ -41,6 +41,7 @@
   failed_when: false
   register: gnuterrypratchett_return
   when: gnuterrypratchett | default(true)
+  check_mode: false
 - name: "U: turn the message around at the end of the line and send it back again :: {{ gnuterrypratchett_return.stdout }}"
   debug:
     var: gnuterrypratchett_return.stdout

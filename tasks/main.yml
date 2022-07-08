@@ -18,6 +18,13 @@
     var: ansible_local.opnsense.core.product_version
     verbosity: 1
 
+- name: force opn_update_desired_version to the lates ...
+  set_fact:
+    opn_update_desired_version: "{{ ansible_local.opnsense.firmware_changelog[-1]['version'] }}"
+  when:
+    - opn_update_desired_version is not defined
+    - opn_update_force | bool
+
 - name: opn_update_desired_version
   debug:
     var: opn_update_desired_version

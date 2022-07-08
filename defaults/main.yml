@@ -4,7 +4,7 @@
 # define this for a fixed series version
 # opn_update_desired_version: false
 
-# set this to tru to just update to the next available version
+# set this to try to just update to the newest available version
 opn_update_force: false
 
 # time in seconds we should wait for a reboot

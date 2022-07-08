@@ -33,10 +33,11 @@ perform a firmware update for opnsense via ansible
 ```
 ansible-playbook -v -e opn_update_desired_version=22.1 -e opn_update_force=true -l opnsense -D firewalls.yml
 ansible-playbook -v -e opn_update_desired_version=21.7 -l opnsense -D firewalls.yml
+ansible-playbook -v -e opn_update_force=true -l opnsense -D firewalls.yml
 ```
 
 ## Notes
 The playbook requires:
   * ansible version >= 2.11 [(due to the split filter)](https://docs.ansible.com/ansible/latest/user_guide/playbooks_filters.html#manipulating-strings)
-  * the [ansible-opnsense-facts](https://github.com/Rosa-Luxemburgstiftung-Berlin/ansible-opnsense-facts) to be run before this
+  * the lates [ansible-opnsense-facts](https://github.com/Rosa-Luxemburgstiftung-Berlin/ansible-opnsense-facts) to be run before this
   * user with shell access to the opnsense box

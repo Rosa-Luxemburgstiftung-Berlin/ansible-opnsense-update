@@ -13,9 +13,14 @@
     msg: "role requires ansible-opnsense-facts"
   when: ansible_local.opnsense.core.product_version is not defined
 
-- name: ansible_local.opnsense.core.product_version
+- name: set unified syntax for opnsense.core.product_version
+  set_fact:
+    opn_current_version: "{{ ansible_local.opnsense.core.product_version | replace('_','.') }}"
+    verbosity: 1
+
+- name: opn_current_version
   debug:
-    var: ansible_local.opnsense.core.product_version
+    var: opn_current_version
     verbosity: 1
 
 - name: force opn_update_desired_version to the lates ...
@@ -34,7 +39,7 @@
   set_fact:
     _opn_update_required: "{{
       (opn_update_desired_version is defined
-      and opn_update_desired_version is version_compare(ansible_local.opnsense.core.product_version, '>'))
+      and opn_update_desired_version is version_compare(opn_current_version, '>'))
       or (opn_update_force | bool)
       }}"
 

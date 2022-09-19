@@ -2,41 +2,41 @@
 ---
 
 - name: check ansible version ...
-  assert:
+  ansible.builtin.assert:
     that: "ansible_version.full is version_compare(2.11, '>=')"
     msg: "please use min. ansible version 2.11"
   tags: always
   run_once: true
 
 - name: check facts ... real facts and not alternative one!
-  fail:
+  ansible.builtin.fail:
     msg: "role requires ansible-opnsense-facts"
   when: ansible_local.opnsense.core.product_version is not defined
 
 - name: set unified syntax for opnsense.core.product_version
-  set_fact:
+  ansible.builtin.set_fact:
     opn_current_version: "{{ ansible_local.opnsense.core.product_version.split('_')[0].strip() }}"
     verbosity: 1
 
 - name: opn_current_version
-  debug:
+  ansible.builtin.debug:
     var: opn_current_version
     verbosity: 1
 
 - name: force opn_update_desired_version to the lates ...
-  set_fact:
+  ansible.builtin.set_fact:
     opn_update_desired_version: "{{ ansible_local.opnsense.firmware_changelog[-1]['version'] }}"
   when:
     - opn_update_desired_version is not defined
     - opn_update_force | bool
 
 - name: opn_update_desired_version
-  debug:
+  ansible.builtin.debug:
     var: opn_update_desired_version
     verbosity: 1
 
 - name: decide if we should run a update
-  set_fact:
+  ansible.builtin.set_fact:
     _opn_update_required: "{{
       (opn_update_desired_version is defined
       and opn_update_desired_version is version_compare(opn_current_version, '>'))
@@ -44,18 +44,18 @@
       }}"
 
 - name: prepare update ...
-  include_tasks: update.yml
+  ansible.builtin.include_tasks: update.yml
   when: _opn_update_required|bool
 
 - name: finally send some clacks over the wire, keeping the legacy of Sir Terry Pratchett alive ...
-  command: "echo 'X-Clacks-Overhead: GNU Terry Pratchett'"
+  ansible.builtin.command: "echo 'X-Clacks-Overhead: GNU Terry Pratchett'"
   changed_when: false
   failed_when: false
   register: gnuterrypratchett_return
   when: gnuterrypratchett | default(true)
   check_mode: false
 - name: "U: turn the message around at the end of the line and send it back again :: {{ gnuterrypratchett_return.stdout }}"
-  debug:
+  ansible.builtin.debug:
     var: gnuterrypratchett_return.stdout
     verbosity: 1
   when: gnuterrypratchett | default(true)

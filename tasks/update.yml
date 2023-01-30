@@ -15,18 +15,18 @@
   ansible.builtin.set_fact:
     _opn_major_update: true
   when:
-    - (_opn_update_desired_base[0] ~ '.' ~ _opn_update_desired_base[1]) is version_compare(ansible_local.opnsense.core.product_series, '>')
+    - (_opn_update_desired_base[0] ~ '.' ~ (_opn_update_desired_base[1] | split('_') | first)) is version_compare(ansible_local.opnsense.core.product_series, '>')
 
 - name: register major update status
   ansible.builtin.set_fact:
-    _opn_major_update: "{% if _opn_check_major_update.stdout | length > 0 %}true{% else %}false{% endif %}"
+    _opn_major_update: "{% if _opn_check_major_update.stdout_lines | length > 0 %}true{% else %}false{% endif %}"
   when:
     - _opn_major_update is undefined or not _opn_major_update
 
 - name: major update require a reboot
   ansible.builtin.set_fact:
     _opn_reboot_required: true
-  when: _opn_major_update
+  when: _opn_major_update | bool
 
 - name: check if update requires a reboot
   ansible.builtin.command: /usr/local/opnsense/scripts/firmware/reboot.sh

@@ -15,7 +15,7 @@
   ansible.builtin.set_fact:
     _opn_major_update: true
   when:
-    - (_opn_update_desired_base[0] ~ '.' ~ (_opn_update_desired_base[1] | split('_') | first)) is version_compare(ansible_local.opnsense.core.product_series, '>')
+    - (_opn_update_desired_base[0] ~ '.' ~ (_opn_update_desired_base[1]|split('_')|first)) is version_compare(ansible_local.opnsense.core.product_series, '>')
 
 - name: register major update status
   ansible.builtin.set_fact:

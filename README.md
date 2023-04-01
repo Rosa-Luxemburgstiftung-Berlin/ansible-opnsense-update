@@ -30,9 +30,19 @@ perform a firmware update for opnsense via ansible
 
 ### Run
 
+
+update to a fixed main release version
 ```
-ansible-playbook -v -e opn_update_desired_version=22.1 -e opn_update_force=true -l opnsense -D firewalls.yml
-ansible-playbook -v -e opn_update_desired_version=21.7 -l opnsense -D firewalls.yml
+ansible-playbook -v -e opn_update_desired_version=22.1.5 -l opnsense -D firewalls.yml
+```
+
+update to a fixed hotfix release
+```
+ansible-playbook -v -e opn_update_desired_version= 23.1.5_4 -l opnsense -D firewalls.yml
+```
+
+update to the lates version available
+```
 ansible-playbook -v -e opn_update_force=true -l opnsense -D firewalls.yml
 ```
 

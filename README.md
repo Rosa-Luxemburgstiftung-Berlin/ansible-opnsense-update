@@ -38,7 +38,7 @@ ansible-playbook -v -e opn_update_desired_version=22.1.5 -l opnsense -D firewall
 
 update to a fixed hotfix release
 ```
-ansible-playbook -v -e opn_update_desired_version= 23.1.5_4 -l opnsense -D firewalls.yml
+ansible-playbook -v -e opn_update_desired_version=23.1.5_4 -l opnsense -D firewalls.yml
 ```
 
 update to the lates version available

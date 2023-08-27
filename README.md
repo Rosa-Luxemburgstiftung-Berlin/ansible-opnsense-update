@@ -18,11 +18,11 @@ perform a firmware update for opnsense via ansible
   vars:
     ansible_become: false
   roles:
-    - role: opnsense-facts
+    - role: ansible-opnsense-facts
       tags:
         - opnsense
         - facts
-    - role: opnsense-update
+    - role: ansible-opnsense-update
       tags:
         - opnsense
         - update

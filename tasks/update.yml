@@ -94,9 +94,15 @@
     msg: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
     verbosity: 1
 
+- name: create update and reboot script
+  ansible.builtin.copy:
+    content: "#!/bin/sh\n/usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}\nreboot\n"
+    dest: /tmp/upgradeandreboot.sh
+    mode: "0700"
+
 - name: "run upgrade and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
-    reboot_command: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
+    reboot_command: /tmp/upgradeandreboot.sh
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
   when:

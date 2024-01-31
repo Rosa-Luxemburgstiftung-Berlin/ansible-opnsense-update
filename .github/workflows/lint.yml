@@ -10,13 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: run ansible-lint
-        uses: ansible/ansible-lint-action@89eb7dec58ac81d46476b715d98e0ec9a411b63f
-        with:
-          override-deps: |
-            rich>=9.5.1,<11.0.0
-            ansible==5.3.0
-            ansible-lint==5.3.1
-          targets: "./"
-          #args: "-q"
+        uses: ansible/ansible-lint@v6.22.2

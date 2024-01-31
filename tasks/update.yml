@@ -66,7 +66,7 @@
   ansible.builtin.set_fact:
     _opn_initial_product_version: "{{ ansible_local.opnsense.core.product_version }}"
 
-- name: set reboot_timeout ...
+- name: set reboot_timeout ...  # noqa jinja[spacing]
   ansible.builtin.set_fact:
     _opn_reboot_timeout: "
       {%- if _opn_major_update -%}
@@ -76,7 +76,7 @@
       {%- endif -%}"
   when: _opn_reboot_required
 
-- name: run update
+- name: run update  # noqa no-changed-when
   ansible.builtin.command: /usr/local/etc/rc.firmware
   when: not _opn_reboot_required
 

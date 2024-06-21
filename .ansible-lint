@@ -1,7 +1,10 @@
 ---
+profile: production
+
 exclude_paths:
   - .github/
 
 skip_list:
   - 'name[casing]'
   - 'name[template]'
+  - yaml[line-length]

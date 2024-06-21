@@ -86,15 +86,10 @@
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
   when:
-    - _opn_reboot_required
-    - not _opn_major_update
+    - _opn_reboot_required or opn_update_force
+    - not _opn_major_update or opn_update_force
 
-- name: debug reboot_command
-  ansible.builtin.debug:
-    msg: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
-    verbosity: 1
-
-- name: "run upgrade and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
+- name: "run upgrade targeting {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }} and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
     reboot_command: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
     reboot_timeout: "{{ _opn_reboot_timeout }}"
@@ -102,6 +97,7 @@
   when:
     - _opn_reboot_required
     - _opn_major_update
+    - not opn_update_force
 
 - name: reload ansible_local facts
   ansible.builtin.setup:

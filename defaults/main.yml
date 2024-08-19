@@ -11,4 +11,6 @@ opn_update_force: false
 opn_update_wait_for_reboot_4_minor_upgrade: 120
 opn_update_wait_for_reboot_4_major_upgrade: 1800
 
+# run a extra pkg upgrade after a upgrade
+opn_update_pkg_upgrade: true
 ...

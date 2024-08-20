@@ -99,6 +99,11 @@
     - _opn_major_update
     - not opn_update_force
 
+- name: run pkg upgrade  # noqa no-changed-when
+  ansible.builtin.command: pkg upgrade -y
+  when:
+    - opn_update_pkg_upgrade | bool
+
 - name: reload ansible_local facts
   ansible.builtin.setup:
     filter: ansible_local

@@ -13,4 +13,10 @@ opn_update_wait_for_reboot_4_major_upgrade: 1800
 
 # run a extra pkg upgrade after a upgrade
 opn_update_pkg_upgrade: true
+
+
+# tweak reboot handling
+post_reboot_delay: 30
+reboot_throttle: 1
+
 ...

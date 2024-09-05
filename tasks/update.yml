@@ -85,6 +85,8 @@
     reboot_command: /usr/local/etc/rc.firmware
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
+    post_reboot_delay: "{{ post_reboot_delay }}"
+  throttle: "{{ reboot_throttle }}"
   when:
     - _opn_reboot_required or opn_update_force
     - not _opn_major_update or opn_update_force
@@ -94,6 +96,8 @@
     reboot_command: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
+    post_reboot_delay: "{{ post_reboot_delay }}"
+  throttle: "{{ reboot_throttle }}"
   when:
     - _opn_reboot_required
     - _opn_major_update

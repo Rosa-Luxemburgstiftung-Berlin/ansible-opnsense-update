@@ -9,9 +9,13 @@
   run_once: true
 
 - name: check facts ... real facts and not alternative one!
-  ansible.builtin.fail:
-    msg: "role requires ansible-opnsense-facts"
-  when: ansible_local.opnsense.core.product_version is not defined
+  ansible.builtin.assert:
+    msg: "role requires current ansible-opnsense-facts"
+    that:
+      - ansible_local.opnsense.core.product_version is defined
+      - ansible_local.ansible_opnsense_facts_version is defined
+      - ansible_local.ansible_opnsense_facts_version is version_compare('0.2', '>='))
+  tags: always
 
 - name: set unified syntax for opnsense.core.product_version
   ansible.builtin.set_fact:

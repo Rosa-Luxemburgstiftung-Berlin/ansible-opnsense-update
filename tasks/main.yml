@@ -19,12 +19,17 @@
 
 - name: get next available update of core package...
   ansible.builtin.set_fact:
-    _core_upgrade_packages: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'equalto', ansible_local.opnsense.core.product_id) }}"
+    _core_upgrade_packages: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'equalto', ansible_local.opnsense.core.product_id) | first }}"
 
 - name: debug _core_upgrade_packages
   ansible.builtin.debug:
     var: _core_upgrade_packages
     verbosity: 1
+  when: _core_upgrade_packages
+
+- name: announce available update
+  ansible.builtin.debug:
+    msg: "update available for {{ _core_upgrade_packages.name }} from {{ _core_upgrade_packages.current_version }} to {{ _core_upgrade_packages.new_version }}"
   when: _core_upgrade_packages
 
 - name: set unified syntax for opnsense.core.product_version

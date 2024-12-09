@@ -16,6 +16,7 @@ opn_update_pkg_upgrade: true
 
 
 # tweak reboot handling
+pre_reboot_delay: 0  # must be greater then 60 and will be rounded to minutes
 post_reboot_delay: 30
 reboot_throttle: 1
 

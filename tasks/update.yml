@@ -85,6 +85,7 @@
     reboot_command: /usr/local/etc/rc.firmware
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
+    pre_reboot_delay: "{{ pre_reboot_delay }}"
     post_reboot_delay: "{{ post_reboot_delay }}"
   throttle: "{{ reboot_throttle }}"
   when:

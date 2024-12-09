@@ -9,13 +9,13 @@
 
 - name: register desired base version
   ansible.builtin.set_fact:
-    _opn_update_desired_base: "{{ opn_update_desired_version | split('.') }}"
+    _opn_update_desired_base: "{{ _opn_update_desired_version.split('.')[0:2] | join('.') }}"
 
-- name: register major update status based on _opn_update_desired_base
+- name: register major update status based on _opn_update_desired_base {{ _opn_update_desired_base }}
   ansible.builtin.set_fact:
     _opn_major_update: true
   when:
-    - (_opn_update_desired_base[0] ~ '.' ~ (_opn_update_desired_base[1]|split('_')|first)) is version_compare(ansible_local.opnsense.core.product_series, '>')
+    - _opn_update_desired_base is version_compare(ansible_local.opnsense.core.product_series, '>')
 
 - name: register major update status
   ansible.builtin.set_fact:
@@ -91,9 +91,9 @@
     - _opn_reboot_required or opn_update_force
     - not _opn_major_update or opn_update_force
 
-- name: "run upgrade targeting {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }} and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
+- name: "run upgrade targeting {{ _opn_update_desired_base }} and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
-    reboot_command: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
+    reboot_command: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base }}
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
     post_reboot_delay: "{{ post_reboot_delay }}"

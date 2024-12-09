@@ -41,9 +41,17 @@
     _opn_reboot_required: "{{ not (_opn_check_reboot_required.rc | bool) }}"
   when: not _opn_major_update
 
-- name: debug opn_current_version
+- name: debug _opn_current_version
   ansible.builtin.debug:
-    var: opn_current_version
+    var: _opn_current_version
+    verbosity: 1
+- name: debug opn_update_desired_version
+  ansible.builtin.debug:
+    var: opn_update_desired_version
+    verbosity: 1
+- name: debug _opn_update_desired_base
+  ansible.builtin.debug:
+    var: _opn_update_desired_base
     verbosity: 1
 - name: debug _opn_check_major_update
   ansible.builtin.debug:

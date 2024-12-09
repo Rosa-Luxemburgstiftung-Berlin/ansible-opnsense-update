@@ -34,7 +34,7 @@
 
 - name: set unified syntax from opnsense.core.product_version
   ansible.builtin.set_fact:
-    _opn_current_version: "{{ ansible_local.opnsense.core.product_version | replace('_','.0.') }}"
+    _opn_current_version: "{{ ansible_local.opnsense.core.product_version | replace('_', '.0.') }}"
 
 - name: _opn_current_version
   ansible.builtin.debug:
@@ -56,7 +56,7 @@
 
 - name: set unified syntax for opn_update_desired_version
   ansible.builtin.set_fact:
-    _opn_update_desired_version: "{{ opn_update_desired_version | replace('_','.0.') }}"
+    _opn_update_desired_version: "{{ opn_update_desired_version | replace('_', '.0.') }}"
   when: opn_update_desired_version is defined
 
 - name: decide if we should run a update

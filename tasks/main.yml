@@ -54,13 +54,16 @@
     var: opn_update_desired_version
     verbosity: 1
 
+- name: set unified syntax for opn_update_desired_version
+  ansible.builtin.set_fact:
+    _opn_update_desired_version: "{{ opn_update_desired_version | replace('_','.0.') }}"
+  when: opn_update_desired_version is defined
+
 - name: decide if we should run a update
   ansible.builtin.set_fact:
-    _opn_update_required: "{{
-      (opn_update_desired_version is defined
-      and opn_update_desired_version is version_compare(opn_current_version, '>'))
-      or (opn_update_force | bool)
-      }}"
+    _opn_update_required:
+      - _opn_update_desired_version is defined
+      - _opn_update_desired_version is version_compare(_opn_current_version, '>')
 
 - name: prepare update ...
   ansible.builtin.include_tasks: update.yml

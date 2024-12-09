@@ -61,13 +61,14 @@
 
 - name: decide if we should run a update
   ansible.builtin.set_fact:
-    _opn_update_required:
+    _opn_update_required: true
+  when:
       - _opn_update_desired_version is defined
       - _opn_update_desired_version is version_compare(_opn_current_version, '>')
 
 - name: prepare update ...
   ansible.builtin.include_tasks: update.yml
-  when: _opn_update_required|bool
+  when: _opn_update_required | default(false) | bool
 
 - name: finally send some clacks over the wire, keeping the legacy of Sir Terry Pratchett alive ...
   ansible.builtin.command: "echo 'X-Clacks-Overhead: GNU Terry Pratchett'"

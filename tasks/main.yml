@@ -32,14 +32,13 @@
     msg: "update available for {{ _core_upgrade_packages.name }} from {{ _core_upgrade_packages.current_version }} to {{ _core_upgrade_packages.new_version }}"
   when: _core_upgrade_packages
 
-- name: set unified syntax for opnsense.core.product_version
+- name: set unified syntax from opnsense.core.product_version
   ansible.builtin.set_fact:
-    opn_current_version: "{{ ansible_local.opnsense.core.product_version.split('_')[0].strip() }}"
-    verbosity: 1
+    _opn_current_version: "{{ ansible_local.opnsense.core.product_version | replace('_','.0.') }}"
 
-- name: opn_current_version
+- name: _opn_current_version
   ansible.builtin.debug:
-    var: opn_current_version
+    var: _opn_current_version
     verbosity: 1
 
 - name: force opn_update_desired_version to the lates ...

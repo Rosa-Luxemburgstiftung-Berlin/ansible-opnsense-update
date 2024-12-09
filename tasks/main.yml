@@ -13,18 +13,19 @@
     msg: "role requires current ansible-opnsense-facts"
     that:
       - ansible_local.opnsense.core.product_version is defined
-      - ansible_local.ansible_opnsense_facts_version is defined
-      - ansible_local.ansible_opnsense_facts_version is version_compare('0.2', '>='))
+      - ansible_local.opnsense.ansible_opnsense_facts_version is defined
+      - ansible_local.opnsense.ansible_opnsense_facts_version is version_compare('0.2', '>=')
   tags: always
 
 - name: get next available update of core package...
   ansible.builtin.set_fact:
-    _core_upgrade_packages: "{{ pkg_upgrade_item.upgrade_packages | selectattr('name', 'equalto', ansible_local.opnsense.core.product_id) }}"
+    _core_upgrade_packages: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'equalto', ansible_local.opnsense.core.product_id) }}"
 
 - name: debug _core_upgrade_packages
   ansible.builtin.debug:
     var: _core_upgrade_packages
     verbosity: 1
+  when: _core_upgrade_packages
 
 - name: set unified syntax for opnsense.core.product_version
   ansible.builtin.set_fact:

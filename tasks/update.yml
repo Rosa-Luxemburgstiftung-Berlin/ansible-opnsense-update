@@ -19,7 +19,7 @@
 
 - name: register major update status
   ansible.builtin.set_fact:
-    _opn_major_update: "{% if _opn_check_major_update.stdout_lines | length > 0 %}true{% else %}false{% endif %}"
+    _opn_major_update: "{{ _opn_check_major_update.stdout_lines | length > 0 }}"
   when:
     - _opn_major_update is undefined or not _opn_major_update
 

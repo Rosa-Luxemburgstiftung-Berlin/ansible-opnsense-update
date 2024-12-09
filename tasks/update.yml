@@ -10,6 +10,7 @@
 - name: register desired base version
   ansible.builtin.set_fact:
     _opn_update_desired_base: "{{ _opn_update_desired_version.split('.')[0:2] | join('.') }}"
+  when: _opn_update_desired_base is not defined
 
 - name: register major update status based on _opn_update_desired_base {{ _opn_update_desired_base }}
   ansible.builtin.set_fact:
@@ -86,7 +87,9 @@
 
 - name: run update  # noqa no-changed-when
   ansible.builtin.command: /usr/local/etc/rc.firmware
-  when: not _opn_reboot_required
+  when:
+    - not _opn_reboot_required
+    - not _opn_major_update
 
 - name: "run update and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
@@ -97,8 +100,8 @@
     post_reboot_delay: "{{ post_reboot_delay }}"
   throttle: "{{ reboot_throttle }}"
   when:
-    - _opn_reboot_required or opn_update_force
-    - not _opn_major_update or opn_update_force
+    - _opn_reboot_required
+    - not _opn_major_update
 
 - name: "run upgrade targeting {{ _opn_update_desired_base }} and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
@@ -108,9 +111,7 @@
     post_reboot_delay: "{{ post_reboot_delay }}"
   throttle: "{{ reboot_throttle }}"
   when:
-    - _opn_reboot_required
     - _opn_major_update
-    - not opn_update_force
 
 - name: run pkg upgrade  # noqa no-changed-when
   ansible.builtin.command: pkg upgrade -y

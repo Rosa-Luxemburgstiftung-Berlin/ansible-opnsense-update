@@ -17,20 +17,49 @@
       - ansible_local.opnsense.ansible_opnsense_facts_version is version_compare('0.2', '>=')
   tags: always
 
+- name: get next available upgrade_major_version
+  ansible.builtin.set_fact:
+    _opn_update_desired_base: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version }}"
+  when:
+    - ansible_local.opnsense.pkg_upgrade is defined
+    - ansible_local.opnsense.pkg_upgrade
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version is defined
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version
+
+- name: debug _opn_update_desired_base
+  ansible.builtin.debug:
+    var: _opn_update_desired_base
+    verbosity: 1
+  when: _opn_update_desired_base
+
+- name: announce available upgrade
+  ansible.builtin.debug:
+    msg:
+      - "upgrade available from {{ ansible_local.opnsense.pkg_upgrade[0].product_version }} to {{ _opn_update_desired_base }}"
+      - "upgrade_major_message:"
+      - "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_message }}"
+  when: _opn_update_desired_base
+
 - name: get next available update of core package...
   ansible.builtin.set_fact:
     _core_upgrade_packages: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'equalto', ansible_local.opnsense.core.product_id) | first }}"
+  when:
+    - _opn_update_desired_base is not defined
+    - ansible_local.opnsense.pkg_upgrade is defined
+    - ansible_local.opnsense.pkg_upgrade
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages is defined
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages
 
 - name: debug _core_upgrade_packages
   ansible.builtin.debug:
     var: _core_upgrade_packages
     verbosity: 1
-  when: _core_upgrade_packages
+  when: _core_upgrade_packages is defined
 
 - name: announce available update
   ansible.builtin.debug:
     msg: "update available for {{ _core_upgrade_packages.name }} from {{ _core_upgrade_packages.current_version }} to {{ _core_upgrade_packages.new_version }}"
-  when: _core_upgrade_packages
+  when: _core_upgrade_packages is defined
 
 - name: set unified syntax from opnsense.core.product_version
   ansible.builtin.set_fact:
@@ -41,13 +70,21 @@
     var: _opn_current_version
     verbosity: 1
 
+- name: force opn_update_desired_version to the next possible upgrade target
+  ansible.builtin.set_fact:
+    opn_update_desired_version: "{{ _opn_update_desired_base }}"
+  when:
+    - opn_update_desired_version is not defined
+    - opn_update_force | bool
+    - _opn_update_desired_base is defined
+
 - name: force opn_update_desired_version to the next possible update target
   ansible.builtin.set_fact:
     opn_update_desired_version: "{{ _core_upgrade_packages.new_version }}"
   when:
     - opn_update_desired_version is not defined
     - opn_update_force | bool
-    - _core_upgrade_packages
+    - _core_upgrade_packages is defined
 
 - name: opn_update_desired_version
   ansible.builtin.debug:

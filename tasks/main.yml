@@ -41,12 +41,13 @@
     var: _opn_current_version
     verbosity: 1
 
-- name: force opn_update_desired_version to the lates ...
+- name: force opn_update_desired_version to the next possible update target
   ansible.builtin.set_fact:
-    opn_update_desired_version: "{{ ansible_local.opnsense.firmware_changelog[-1]['version'] }}"
+    opn_update_desired_version: "{{ _core_upgrade_packages.new_version }}"
   when:
     - opn_update_desired_version is not defined
     - opn_update_force | bool
+    - _core_upgrade_packages
 
 - name: opn_update_desired_version
   ansible.builtin.debug:

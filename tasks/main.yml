@@ -42,7 +42,7 @@
 
 - name: get next available update of core package...
   ansible.builtin.set_fact:
-    _core_upgrade_packages: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'equalto', ansible_local.opnsense.core.product_id) | first }}"
+    _core_upgrade_packages: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'in', [ansible_local.opnsense.core.product_id, 'base']) | first }}"
   when:
     - _opn_update_desired_base is not defined
     - ansible_local.opnsense.pkg_upgrade is defined

@@ -16,6 +16,7 @@
   ansible.builtin.set_fact:
     _opn_major_update: true
   when:
+    - _opn_major_update is not defined
     - _opn_update_desired_base is version_compare(ansible_local.opnsense.core.product_series, '>')
 
 - name: register major update status

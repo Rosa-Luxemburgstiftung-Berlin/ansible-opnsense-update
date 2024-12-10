@@ -22,6 +22,7 @@
   ansible.builtin.set_fact:
     _opn_update_desired_base: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version }}"
     _opn_reboot_required: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_needs_reboot | int > 0 }}"
+    _opn_major_update: true
   when:
     - ansible_local.opnsense.pkg_upgrade is defined
     - ansible_local.opnsense.pkg_upgrade

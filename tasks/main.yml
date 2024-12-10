@@ -37,6 +37,7 @@
 - name: force opn_update_desired_version to the next possible upgrade target
   ansible.builtin.set_fact:
     opn_update_desired_version: "{{ _opn_update_desired_base }}"
+    _opn_current_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version | replace('_', '.0.') }}"
   when:
     - opn_update_desired_version is not defined
     - opn_update_force | bool
@@ -70,9 +71,10 @@
     verbosity: 1
   when: _core_upgrade_packages is defined
 
-- name: force opn_update_desired_version to the next possible update target
+- name: set opn_update_desired_version and _opn_current_version for the next possible update target
   ansible.builtin.set_fact:
     opn_update_desired_version: "{{ _core_upgrade_packages.new_version }}"
+    _opn_current_version: "{{ _core_upgrade_packages.current_version | replace('_', '.0.') }}"
   when:
     - opn_update_desired_version is not defined
     - opn_update_force | bool
@@ -89,6 +91,7 @@
 - name: set unified syntax from opnsense.core.product_version
   ansible.builtin.set_fact:
     _opn_current_version: "{{ ansible_local.opnsense.core.product_version | replace('_', '.0.') }}"
+  when: _opn_current_version is not defined
 
 - name: _opn_current_version
   ansible.builtin.debug:

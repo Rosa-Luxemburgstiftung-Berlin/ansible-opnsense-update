@@ -30,7 +30,7 @@
   ansible.builtin.debug:
     var: _opn_update_desired_base
     verbosity: 1
-  when: _opn_update_desired_base
+  when: _opn_update_desired_base is defined
 
 - name: announce available upgrade
   ansible.builtin.debug:
@@ -38,7 +38,7 @@
       - "upgrade available from {{ ansible_local.opnsense.pkg_upgrade[0].product_version }} to {{ _opn_update_desired_base }}"
       - "upgrade_major_message:"
       - "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_message }}"
-  when: _opn_update_desired_base
+  when: _opn_update_desired_base is defined
 
 - name: get next available update of core package...
   ansible.builtin.set_fact:

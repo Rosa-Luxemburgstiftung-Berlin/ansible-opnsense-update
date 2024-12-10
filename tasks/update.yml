@@ -136,7 +136,6 @@
   ansible.builtin.command: pkg upgrade -y
   when:
     - opn_update_pkg_upgrade | bool
-  when:
     - not _opn_reboot_required
     - not _opn_major_update
 

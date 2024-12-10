@@ -81,6 +81,7 @@
 - name: register opnsense version before the update
   ansible.builtin.set_fact:
     _opn_initial_product_version: "{{ _opn_current_version | default(ansible_local.opnsense.core.product_version) }}"
+  when: _opn_initial_product_version is not defined
 
 - name: set reboot_timeout ...  # noqa jinja[spacing]
   ansible.builtin.set_fact:

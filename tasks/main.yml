@@ -39,6 +39,7 @@
   ansible.builtin.set_fact:
     opn_update_desired_version: "{{ _opn_update_desired_base }}"
     _opn_current_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version | replace('_', '.0.') }}"
+    _opn_initial_product_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version }}"
   when:
     - opn_update_desired_version is not defined
     - opn_update_force | bool
@@ -76,6 +77,7 @@
   ansible.builtin.set_fact:
     opn_update_desired_version: "{{ _core_upgrade_packages.new_version }}"
     _opn_current_version: "{{ _core_upgrade_packages.current_version | replace('_', '.0.') }}"
+    _opn_initial_product_version: "{{ _core_upgrade_packages.current_version }}"
   when:
     - opn_update_desired_version is not defined
     - opn_update_force | bool

@@ -17,6 +17,7 @@
       - ansible_local.opnsense.ansible_opnsense_facts_version is version_compare('0.2', '>=')
   tags: always
 
+# get informations for major upgrades from pkg_upgrade fact
 - name: get next available upgrade_major_version
   ansible.builtin.set_fact:
     _opn_update_desired_base: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version }}"
@@ -39,7 +40,9 @@
       - "upgrade_major_message:"
       - "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_message }}"
   when: _opn_update_desired_base is defined
+# END get informations for major upgrades from pkg_upgrade fact
 
+# get informations for updates from pkg_upgrade fact
 - name: get next available update of core package...
   ansible.builtin.set_fact:
     _core_upgrade_packages: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'in', [ansible_local.opnsense.core.product_id, 'base']) | first }}"
@@ -60,6 +63,7 @@
   ansible.builtin.debug:
     msg: "update available for {{ _core_upgrade_packages.name }} from {{ _core_upgrade_packages.current_version }} to {{ _core_upgrade_packages.new_version }}"
   when: _core_upgrade_packages is defined
+# END get informations for updates from pkg_upgrade fact
 
 - name: set unified syntax from opnsense.core.product_version
   ansible.builtin.set_fact:

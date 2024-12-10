@@ -28,7 +28,9 @@
 - name: major update require a reboot
   ansible.builtin.set_fact:
     _opn_reboot_required: true
-  when: _opn_major_update | bool
+  when:
+    - _opn_reboot_required is not defined
+    - _opn_major_update | bool
 
 - name: check if update requires a reboot
   ansible.builtin.command: /usr/local/opnsense/scripts/firmware/reboot.sh
@@ -36,12 +38,16 @@
   failed_when: false
   check_mode: false
   register: _opn_check_reboot_required
-  when: not _opn_major_update
+  when:
+    - _opn_reboot_required is not defined
+    - not _opn_major_update
 
 - name: register reboot required status
   ansible.builtin.set_fact:
     _opn_reboot_required: "{{ not (_opn_check_reboot_required.rc | bool) }}"
-  when: not _opn_major_update
+  when:
+    - _opn_reboot_required is not defined
+    - not _opn_major_update
 
 - name: debug _opn_current_version
   ansible.builtin.debug:

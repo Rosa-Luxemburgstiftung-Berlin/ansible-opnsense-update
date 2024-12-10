@@ -136,8 +136,8 @@
   ansible.builtin.command: pkg upgrade -y
   when:
     - opn_update_pkg_upgrade | bool
-    - not _opn_reboot_required
-    - not _opn_major_update
+    - _opn_reboot_required is not defined or not _opn_reboot_required
+    - _opn_major_update is not defined or not _opn_major_update
 
 - name: reload ansible_local facts
   ansible.builtin.setup:

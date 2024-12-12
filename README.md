@@ -74,24 +74,6 @@ In some cases this step must be repeated until the latest release is reached.
 ansible-playbook -v -e opn_update_force=true -D opnsenseupdate.yml
 ```
 
-#### update/upgrade to a defined version
-
-Performing a update/upgrade to a defined version requires some caution on the user site.
-The desired version must be *reachable* from  the current version, i.e. no interim update step should be requied.
-Genrally spoken: you can **not** update this way to a version greater then the one that would have been reached during the next run using the `-e opn_update_force=true`.
-You can determine this using the steps described unter **determine the next possible update/upgrade step**.
-
-update to a fixed main release version
-```
-ansible-playbook -v -e opn_update_desired_version=22.1.5 -D opnsenseupdate.yml
-```
-
-update to a fixed hotfix release
-```
-ansible-playbook -v -e opn_update_desired_version=23.1.5_4 -D opnsenseupdate.yml
-```
-
-
 ## Notes
 
 The playbook requires:

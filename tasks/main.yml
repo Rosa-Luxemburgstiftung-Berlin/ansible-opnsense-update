@@ -40,13 +40,12 @@
     verbosity: 1
   when: _opn_update_desired_base is defined
 
-- name: force opn_update_desired_version to the next possible upgrade target
+- name: force _opn_update_desired_version to the next possible upgrade target
   ansible.builtin.set_fact:
-    opn_update_desired_version: "{{ _opn_update_desired_base }}"
+    _opn_update_desired_version: "{{ _opn_update_desired_base }}"
     _opn_current_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version | replace('_', '.0.') }}"
     _opn_initial_product_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version }}"
   when:
-    - opn_update_desired_version is not defined
     - opn_update_force | bool
     - _opn_update_desired_base is defined
 
@@ -78,13 +77,12 @@
     verbosity: 1
   when: _core_upgrade_packages is defined
 
-- name: set opn_update_desired_version and _opn_current_version for the next possible update target
+- name: set _opn_update_desired_version and _opn_current_version for the next possible update target
   ansible.builtin.set_fact:
-    opn_update_desired_version: "{{ _core_upgrade_packages.new_version }}"
+    _opn_update_desired_version: "{{ _core_upgrade_packages.new_version }}"
     _opn_current_version: "{{ _core_upgrade_packages.current_version | replace('_', '.0.') }}"
     _opn_initial_product_version: "{{ _core_upgrade_packages.current_version }}"
   when:
-    - opn_update_desired_version is not defined
     - opn_update_force | bool
     - _core_upgrade_packages is defined
 
@@ -106,15 +104,15 @@
     var: _opn_current_version
     verbosity: 1
 
-- name: opn_update_desired_version
+- name: _opn_update_desired_version
   ansible.builtin.debug:
-    var: opn_update_desired_version
+    var: _opn_update_desired_version
     verbosity: 1
 
-- name: set unified syntax for opn_update_desired_version
+- name: set unified syntax for _opn_update_desired_version
   ansible.builtin.set_fact:
-    _opn_update_desired_version_unified: "{{ opn_update_desired_version | replace('_', '.0.') }}"
-  when: opn_update_desired_version is defined
+    _opn_update_desired_version_unified: "{{ _opn_update_desired_version | replace('_', '.0.') }}"
+  when: _opn_update_desired_version is defined
 
 - name: decide if we should run a update
   ansible.builtin.set_fact:

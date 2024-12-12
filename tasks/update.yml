@@ -53,9 +53,9 @@
   ansible.builtin.debug:
     var: _opn_current_version
     verbosity: 1
-- name: debug opn_update_desired_version
+- name: debug _opn_update_desired_version
   ansible.builtin.debug:
-    var: opn_update_desired_version
+    var: _opn_update_desired_version
     verbosity: 1
 - name: debug _opn_update_desired_base
   ansible.builtin.debug:

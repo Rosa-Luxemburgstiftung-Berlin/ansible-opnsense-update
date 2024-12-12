@@ -9,7 +9,7 @@
 
 - name: register desired base version
   ansible.builtin.set_fact:
-    _opn_update_desired_base: "{{ _opn_update_desired_version.split('.')[0:2] | join('.') }}"
+    _opn_update_desired_base: "{{ _opn_update_desired_version_unified.split('.')[0:2] | join('.') }}"
   when: _opn_update_desired_base is not defined
 
 - name: register major update status based on _opn_update_desired_base {{ _opn_update_desired_base }}

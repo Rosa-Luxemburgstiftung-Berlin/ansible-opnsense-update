@@ -2,7 +2,7 @@
 ---
 
 # set this to try to update to the newest available version
-opn_update_force: false
+opn_update: false
 
 # time in seconds we should wait for a reboot
 opn_update_wait_for_reboot_4_minor_upgrade: 120

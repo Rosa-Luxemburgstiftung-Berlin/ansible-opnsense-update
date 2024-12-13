@@ -71,7 +71,7 @@ Update to the the next upgradable version.
 (this should correspond to the way a update would have been performed using the WebUI).
 In some cases this step must be repeated until the latest release is reached.
 ```
-ansible-playbook -v -e opn_update_force=true -D opnsenseupdate.yml
+ansible-playbook -v -e opn_update=true -D opnsenseupdate.yml
 ```
 
 ## Notes

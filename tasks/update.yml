@@ -69,7 +69,7 @@
       {%- else -%}
         {{ opn_update_wait_for_reboot_4_minor_upgrade }}
       {%- endif -%}"
-  when: _opn_reboot_required or opn_update_force
+  when: _opn_reboot_required or opn_update
 
 - name: run update  # noqa no-changed-when
   ansible.builtin.command: /usr/local/etc/rc.firmware

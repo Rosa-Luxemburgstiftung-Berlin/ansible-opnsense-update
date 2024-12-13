@@ -46,7 +46,7 @@
     _opn_current_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version | replace('_', '.0.') }}"
     _opn_initial_product_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version }}"
   when:
-    - opn_update_force | bool
+    - opn_update | bool
     - _opn_update_desired_base is defined
 
 - name: announce available upgrade
@@ -83,7 +83,7 @@
     _opn_current_version: "{{ _core_upgrade_packages.current_version | replace('_', '.0.') }}"
     _opn_initial_product_version: "{{ _core_upgrade_packages.current_version }}"
   when:
-    - opn_update_force | bool
+    - opn_update | bool
     - _core_upgrade_packages is defined
 
 - name: announce available update

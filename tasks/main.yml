@@ -130,6 +130,24 @@
   ansible.builtin.include_tasks: update.yml
   when: _opn_update_required | default(false) | bool
 
+- name: pkg upgrade
+  when: opn_pkg_upgrade | bool
+  block:
+    - name: register opnsense version before pkg upgrade
+      ansible.builtin.set_fact:
+        _opn_initial_product_version: "{{ ansible_local.opnsense.core.product_version }}"
+
+    - name: run pkg upgrade  # noqa no-changed-when
+      ansible.builtin.command: pkg upgrade -y
+
+    - name: reload ansible_local facts
+      ansible.builtin.setup:
+        filter: ansible_local
+
+    - name: update performed status after pkg upgrade ...
+      ansible.builtin.debug:
+        msg: "pkg upgrade finished : from {{ _opn_initial_product_version }} to {{ ansible_local.opnsense.core.product_version }}"
+
 - name: finally send some clacks over the wire, keeping the legacy of Sir Terry Pratchett alive ...
   ansible.builtin.command: "echo 'X-Clacks-Overhead: GNU Terry Pratchett'"
   changed_when: false
@@ -137,6 +155,7 @@
   register: gnuterrypratchett_return
   when: gnuterrypratchett | default(true)
   check_mode: false
+
 - name: "U: turn the message around at the end of the line and send it back again :: {{ gnuterrypratchett_return.stdout }}"
   ansible.builtin.debug:
     var: gnuterrypratchett_return.stdout

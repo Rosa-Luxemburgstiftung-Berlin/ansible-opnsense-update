@@ -64,7 +64,7 @@ ok: [OPNsense2] => {
 }
 ```
 
-#### update/upgrade the recommendet way
+#### update/upgrade
 
 Update to the the next upgradable version.
 (this might **not** be the latest version, as sometimes several iterations are required to reach this target)
@@ -73,6 +73,17 @@ In some cases this step must be repeated until the latest release is reached.
 ```
 ansible-playbook -v -e opn_update=true -D opnsenseupdate.yml
 ```
+
+### pkg upgrade
+
+In order to run a `pkg upgrade` please use
+
+```
+ansible-playbook -e opn_pkg_upgrade=true ...
+```
+
+This can be run as a extra step or direct after a update/upgrade (combining `-e opn_pkg_upgrade=true` and `-e opn_update=true`)
+
 
 ## Notes
 

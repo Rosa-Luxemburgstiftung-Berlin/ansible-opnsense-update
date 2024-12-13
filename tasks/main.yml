@@ -6,6 +6,11 @@
     that: opn_update_desired_version is not defined
     msg: opn_update_desired_version is deprecated
 
+- name: opn_update_force is deprecated
+  ansible.builtin.assert:
+    that: opn_update_force is not defined
+    msg: opn_update_force is deprecated; use opn_update instead
+
 - name: check ansible version ...
   ansible.builtin.assert:
     that: "ansible_version.full is version_compare(2.11, '>=')"

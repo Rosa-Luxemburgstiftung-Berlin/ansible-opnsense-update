@@ -71,6 +71,10 @@
       {%- endif -%}"
   when: _opn_reboot_required or opn_update
 
+- name: announce the upcoming update/upgrade
+  ansible.builtin.debug:
+    msg: "will perform a update/upgrade from {{ _opn_current_version }} to {{ _opn_update_desired_version | default(_opn_update_desired_base) }}"
+
 - name: run update  # noqa no-changed-when
   ansible.builtin.command: /usr/local/etc/rc.firmware
   when:

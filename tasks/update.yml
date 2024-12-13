@@ -49,33 +49,16 @@
     - _opn_reboot_required is not defined
     - not _opn_major_update
 
-- name: debug _opn_current_version
+- name: debug vars ...
   ansible.builtin.debug:
-    var: _opn_current_version
-    verbosity: 1
-- name: debug _opn_update_desired_version
-  ansible.builtin.debug:
-    var: _opn_update_desired_version
-    verbosity: 1
-- name: debug _opn_update_desired_base
-  ansible.builtin.debug:
-    var: _opn_update_desired_base
-    verbosity: 1
-- name: debug _opn_check_major_update
-  ansible.builtin.debug:
-    var: _opn_check_major_update
-    verbosity: 1
-- name: debug _opn_major_update
-  ansible.builtin.debug:
-    var: _opn_major_update
-    verbosity: 1
-- name: debug _opn_check_reboot_required
-  ansible.builtin.debug:
-    var: _opn_check_reboot_required
-    verbosity: 1
-- name: debug _opn_reboot_required
-  ansible.builtin.debug:
-    var: _opn_reboot_required
+    msg:
+      - "_opn_current_version: {{ _opn_current_version }}"
+      - "_opn_update_desired_version: {{ _opn_update_desired_version }}"
+      - "_opn_update_desired_base: {{ _opn_update_desired_base }}"
+      - "_opn_check_major_update: {{ _opn_check_major_update }}"
+      - "_opn_major_update: {{ _opn_major_update }}"
+      - "_opn_check_reboot_required: {{ _opn_check_reboot_required }}"
+      - "_opn_reboot_required: {{ _opn_reboot_required }}"
     verbosity: 1
 
 - name: set reboot_timeout ...  # noqa jinja[spacing]

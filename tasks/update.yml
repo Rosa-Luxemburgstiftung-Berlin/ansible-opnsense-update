@@ -103,6 +103,11 @@
   when:
     - _opn_major_update
 
+- name: clean up old facts
+  ansible.builtin.file:
+    path: /tmp/pkg_upgrade.json
+    state: absent
+
 - name: reload ansible_local facts
   ansible.builtin.setup:
     filter: ansible_local

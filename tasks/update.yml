@@ -9,24 +9,28 @@
 
 - name: register desired base version
   ansible.builtin.set_fact:
-    _opn_update_desired_base: "{{ opn_update_desired_version | split('.') }}"
+    _opn_update_desired_base: "{{ _opn_update_desired_version_unified.split('.')[0:2] | join('.') }}"
+  when: _opn_update_desired_base is not defined
 
-- name: register major update status based on _opn_update_desired_base
+- name: register major update status based on _opn_update_desired_base {{ _opn_update_desired_base }}
   ansible.builtin.set_fact:
     _opn_major_update: true
   when:
-    - (_opn_update_desired_base[0] ~ '.' ~ (_opn_update_desired_base[1]|split('_')|first)) is version_compare(ansible_local.opnsense.core.product_series, '>')
+    - _opn_major_update is not defined
+    - _opn_update_desired_base is version_compare(ansible_local.opnsense.core.product_series, '>')
 
 - name: register major update status
   ansible.builtin.set_fact:
-    _opn_major_update: "{% if _opn_check_major_update.stdout_lines | length > 0 %}true{% else %}false{% endif %}"
+    _opn_major_update: "{{ _opn_check_major_update.stdout_lines | length > 0 }}"
   when:
     - _opn_major_update is undefined or not _opn_major_update
 
 - name: major update require a reboot
   ansible.builtin.set_fact:
     _opn_reboot_required: true
-  when: _opn_major_update | bool
+  when:
+    - _opn_reboot_required is not defined
+    - _opn_major_update | bool
 
 - name: check if update requires a reboot
   ansible.builtin.command: /usr/local/opnsense/scripts/firmware/reboot.sh
@@ -34,37 +38,28 @@
   failed_when: false
   check_mode: false
   register: _opn_check_reboot_required
-  when: not _opn_major_update
+  when:
+    - _opn_reboot_required is not defined
+    - not _opn_major_update
 
 - name: register reboot required status
   ansible.builtin.set_fact:
     _opn_reboot_required: "{{ not (_opn_check_reboot_required.rc | bool) }}"
-  when: not _opn_major_update
+  when:
+    - _opn_reboot_required is not defined
+    - not _opn_major_update
 
-- name: debug opn_current_version
+- name: debug vars ...
   ansible.builtin.debug:
-    var: opn_current_version
+    msg:
+      - "_opn_current_version: {{ _opn_current_version }}"
+      - "_opn_update_desired_version: {{ _opn_update_desired_version }}"
+      - "_opn_update_desired_base: {{ _opn_update_desired_base }}"
+      - "_opn_check_major_update: {{ _opn_check_major_update }}"
+      - "_opn_major_update: {{ _opn_major_update }}"
+      - "_opn_check_reboot_required: {{ _opn_check_reboot_required }}"
+      - "_opn_reboot_required: {{ _opn_reboot_required }}"
     verbosity: 1
-- name: debug _opn_check_major_update
-  ansible.builtin.debug:
-    var: _opn_check_major_update
-    verbosity: 1
-- name: debug _opn_major_update
-  ansible.builtin.debug:
-    var: _opn_major_update
-    verbosity: 1
-- name: debug _opn_check_reboot_required
-  ansible.builtin.debug:
-    var: _opn_check_reboot_required
-    verbosity: 1
-- name: debug _opn_reboot_required
-  ansible.builtin.debug:
-    var: _opn_reboot_required
-    verbosity: 1
-
-- name: register opnsense version before the update
-  ansible.builtin.set_fact:
-    _opn_initial_product_version: "{{ ansible_local.opnsense.core.product_version }}"
 
 - name: set reboot_timeout ...  # noqa jinja[spacing]
   ansible.builtin.set_fact:
@@ -74,39 +69,39 @@
       {%- else -%}
         {{ opn_update_wait_for_reboot_4_minor_upgrade }}
       {%- endif -%}"
-  when: _opn_reboot_required or opn_update_force
+  when: _opn_reboot_required or opn_update
+
+- name: announce the upcoming update/upgrade
+  ansible.builtin.debug:
+    msg: "will perform a update/upgrade from {{ _opn_current_version }} to {{ _opn_update_desired_version | default(_opn_update_desired_base) }}"
 
 - name: run update  # noqa no-changed-when
   ansible.builtin.command: /usr/local/etc/rc.firmware
-  when: not _opn_reboot_required
+  when:
+    - not _opn_reboot_required
+    - not _opn_major_update
 
 - name: "run update and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
     reboot_command: /usr/local/etc/rc.firmware
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
+    pre_reboot_delay: "{{ pre_reboot_delay }}"
     post_reboot_delay: "{{ post_reboot_delay }}"
   throttle: "{{ reboot_throttle }}"
   when:
-    - _opn_reboot_required or opn_update_force
-    - not _opn_major_update or opn_update_force
+    - _opn_reboot_required
+    - not _opn_major_update
 
-- name: "run upgrade targeting {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }} and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
+- name: "run upgrade targeting {{ _opn_update_desired_base }} and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
-    reboot_command: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base[0] }}.{{ _opn_update_desired_base[1] }}
+    reboot_command: /usr/local/etc/rc.firmware upgrade {{ _opn_update_desired_base }}
     reboot_timeout: "{{ _opn_reboot_timeout }}"
     connect_timeout: 20
     post_reboot_delay: "{{ post_reboot_delay }}"
   throttle: "{{ reboot_throttle }}"
   when:
-    - _opn_reboot_required
     - _opn_major_update
-    - not opn_update_force
-
-- name: run pkg upgrade  # noqa no-changed-when
-  ansible.builtin.command: pkg upgrade -y
-  when:
-    - opn_update_pkg_upgrade | bool
 
 - name: reload ansible_local facts
   ansible.builtin.setup:
@@ -114,6 +109,6 @@
 
 - name: trumpet the news all ower the town ...
   ansible.builtin.debug:
-    msg: "update performed from {{ _opn_initial_product_version }} to {{ ansible_local.opnsense.core.product_version }}"
+    msg: "update/upgrade performed from {{ _opn_initial_product_version }} to {{ ansible_local.opnsense.core.product_version }}"
 
 ...

@@ -1,21 +1,18 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smartindent nu ft=yaml
 ---
 
-# define this for a fixed series version
-# opn_update_desired_version: false
+# set this to try to update to the newest available version
+opn_update: false
 
-# set this to try to just update to the newest available version
-opn_update_force: false
+# run a extra pkg upgrade
+opn_pkg_upgrade: false
 
 # time in seconds we should wait for a reboot
 opn_update_wait_for_reboot_4_minor_upgrade: 120
 opn_update_wait_for_reboot_4_major_upgrade: 1800
 
-# run a extra pkg upgrade after a upgrade
-opn_update_pkg_upgrade: true
-
-
 # tweak reboot handling
+pre_reboot_delay: 0  # must be greater then 60 and will be rounded to minutes
 post_reboot_delay: 30
 reboot_throttle: 1
 

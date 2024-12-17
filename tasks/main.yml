@@ -1,6 +1,16 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smartindent nu ft=yaml
 ---
 
+- name: opn_update_desired_version is deprecated
+  ansible.builtin.assert:
+    that: opn_update_desired_version is not defined
+    msg: opn_update_desired_version is deprecated
+
+- name: opn_update_force is deprecated
+  ansible.builtin.assert:
+    that: opn_update_force is not defined
+    msg: opn_update_force is deprecated; use opn_update instead
+
 - name: check ansible version ...
   ansible.builtin.assert:
     that: "ansible_version.full is version_compare(2.11, '>=')"
@@ -9,43 +19,134 @@
   run_once: true
 
 - name: check facts ... real facts and not alternative one!
-  ansible.builtin.fail:
-    msg: "role requires ansible-opnsense-facts"
-  when: ansible_local.opnsense.core.product_version is not defined
+  ansible.builtin.assert:
+    msg: "role requires current ansible-opnsense-facts"
+    that:
+      - ansible_local.opnsense.core.product_version is defined
+      - ansible_local.opnsense.ansible_opnsense_facts_version is defined
+      - ansible_local.opnsense.ansible_opnsense_facts_version is version_compare('0.2', '>=')
+  tags: always
 
-- name: set unified syntax for opnsense.core.product_version
+# get informations for major upgrades from pkg_upgrade fact
+- name: get next available upgrade_major_version
   ansible.builtin.set_fact:
-    opn_current_version: "{{ ansible_local.opnsense.core.product_version.split('_')[0].strip() }}"
-    verbosity: 1
-
-- name: opn_current_version
-  ansible.builtin.debug:
-    var: opn_current_version
-    verbosity: 1
-
-- name: force opn_update_desired_version to the lates ...
-  ansible.builtin.set_fact:
-    opn_update_desired_version: "{{ ansible_local.opnsense.firmware_changelog[-1]['version'] }}"
+    _opn_update_desired_base: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version }}"
+    _opn_reboot_required: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_needs_reboot | int > 0 }}"
+    _opn_major_update: true
   when:
-    - opn_update_desired_version is not defined
-    - opn_update_force | bool
+    - ansible_local.opnsense.pkg_upgrade is defined
+    - ansible_local.opnsense.pkg_upgrade
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version is defined
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version
 
-- name: opn_update_desired_version
+- name: debug _opn_update_desired_base
   ansible.builtin.debug:
-    var: opn_update_desired_version
+    var: _opn_update_desired_base
     verbosity: 1
+  when: _opn_update_desired_base is defined
+
+- name: force _opn_update_desired_version to the next possible upgrade target
+  ansible.builtin.set_fact:
+    _opn_update_desired_version: "{{ _opn_update_desired_base }}"
+    _opn_current_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version | replace('_', '.0.') }}"
+    _opn_initial_product_version: "{{ ansible_local.opnsense.pkg_upgrade[0].product_version }}"
+  when:
+    - opn_update | bool
+    - _opn_update_desired_base is defined
+
+- name: announce available upgrade
+  ansible.builtin.debug:
+    msg:
+      - "upgrade available from {{ ansible_local.opnsense.pkg_upgrade[0].product_version }} to {{ _opn_update_desired_base }}"
+      - "reboot_required: {{ _opn_reboot_required }}"
+      - "upgrade_major_message:"
+      - "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_message }}"
+  when: _opn_update_desired_base is defined
+# END get informations for major upgrades from pkg_upgrade fact
+
+# get informations for updates from pkg_upgrade fact
+- name: get next available update of core package...
+  ansible.builtin.set_fact:
+    _core_upgrade_packages: "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'in', [ansible_local.opnsense.core.product_id, 'base']) | first }}"
+    _opn_reboot_required: "{{ ansible_local.opnsense.pkg_upgrade[0].needs_reboot | int > 0 }}"
+  when:
+    - _opn_update_desired_base is not defined
+    - ansible_local.opnsense.pkg_upgrade is defined
+    - ansible_local.opnsense.pkg_upgrade
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages is defined
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages
+
+- name: debug _core_upgrade_packages
+  ansible.builtin.debug:
+    var: _core_upgrade_packages
+    verbosity: 1
+  when: _core_upgrade_packages is defined
+
+- name: set _opn_update_desired_version and _opn_current_version for the next possible update target
+  ansible.builtin.set_fact:
+    _opn_update_desired_version: "{{ _core_upgrade_packages.new_version }}"
+    _opn_current_version: "{{ _core_upgrade_packages.current_version | replace('_', '.0.') }}"
+    _opn_initial_product_version: "{{ _core_upgrade_packages.current_version }}"
+  when:
+    - opn_update | bool
+    - _core_upgrade_packages is defined
+
+- name: announce available update
+  ansible.builtin.debug:
+    msg:
+      - "update available for {{ _core_upgrade_packages.name }} from {{ _core_upgrade_packages.current_version }} to {{ _core_upgrade_packages.new_version }}"
+      - "reboot_required: {{ _opn_reboot_required }}"
+  when: _core_upgrade_packages is defined
+# END get informations for updates from pkg_upgrade fact
+
+- name: set unified syntax from opnsense.core.product_version
+  ansible.builtin.set_fact:
+    _opn_current_version: "{{ ansible_local.opnsense.core.product_version | replace('_', '.0.') }}"
+  when: _opn_current_version is not defined
+
+- name: _opn_current_version
+  ansible.builtin.debug:
+    var: _opn_current_version
+    verbosity: 1
+
+- name: _opn_update_desired_version
+  ansible.builtin.debug:
+    var: _opn_update_desired_version
+    verbosity: 1
+
+- name: set unified syntax for _opn_update_desired_version
+  ansible.builtin.set_fact:
+    _opn_update_desired_version_unified: "{{ _opn_update_desired_version | replace('_', '.0.') }}"
+  when: _opn_update_desired_version is defined
 
 - name: decide if we should run a update
   ansible.builtin.set_fact:
-    _opn_update_required: "{{
-      (opn_update_desired_version is defined
-      and opn_update_desired_version is version_compare(opn_current_version, '>'))
-      or (opn_update_force | bool)
-      }}"
+    _opn_update_required: true
+  when:
+    - _opn_update_desired_version_unified is defined
+    - _opn_update_desired_version_unified is version_compare(_opn_current_version, '>')
 
 - name: prepare update ...
   ansible.builtin.include_tasks: update.yml
-  when: _opn_update_required|bool
+  when: _opn_update_required | default(false) | bool
+
+- name: pkg upgrade
+  when: opn_pkg_upgrade | bool
+  block:
+    - name: register opnsense version before pkg upgrade
+      ansible.builtin.set_fact:
+        _opn_initial_product_version: "{{ ansible_local.opnsense.core.product_version }}"
+
+    - name: run pkg upgrade  # noqa no-changed-when
+      ansible.builtin.command: pkg upgrade -y
+
+    - name: reload ansible_local facts
+      ansible.builtin.setup:
+        filter: ansible_local
+
+    - name: update performed status after pkg upgrade ...
+      ansible.builtin.debug:
+        msg: "pkg upgrade finished : from {{ _opn_initial_product_version }} to {{ ansible_local.opnsense.core.product_version }}"
 
 - name: finally send some clacks over the wire, keeping the legacy of Sir Terry Pratchett alive ...
   ansible.builtin.command: "echo 'X-Clacks-Overhead: GNU Terry Pratchett'"
@@ -54,6 +155,7 @@
   register: gnuterrypratchett_return
   when: gnuterrypratchett | default(true)
   check_mode: false
+
 - name: "U: turn the message around at the end of the line and send it back again :: {{ gnuterrypratchett_return.stdout }}"
   ansible.builtin.debug:
     var: gnuterrypratchett_return.stdout

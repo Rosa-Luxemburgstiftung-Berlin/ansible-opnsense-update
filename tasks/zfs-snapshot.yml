@@ -4,7 +4,7 @@
   ansible.builtin.assert:
     that:
       - ansible_local.opnsense.zfs_snapshot.supported.status is defined
-      - ansible_local.opnsense.zfs_snapshot.supported.status == 'OK'
+      - ansible_local.opnsense.zfs_snapshot.supported.status | upper == 'OK'
     msg: "ZFS snapshots are not supported on the current system"
 
 - name: get list of existing snapshots
@@ -15,3 +15,22 @@
   ansible.builtin.debug:
     var: _zfs_snapshot_list
     verbosity: 1
+
+- name: create snapshot
+  ansible.builtin.command: "configctl zfs snapshot create {{ opn_snapshot_name }}"
+  register: _zfs_snapshot_create
+
+- name: ... parse output
+  ansible.builtin.set_fact:
+    _zfs_snapshot_created_status: "{{ _zfs_snapshot_create.stdout | from_json }}"
+  when: not ansible_check_mode
+
+- name: print output of create snapshot
+  ansible.builtin.debug:
+    var: _zfs_snapshot_created_status
+
+- name: assert snapshot was created
+  ansible.builtin.assert:
+    that: _zfs_snapshot_created_status.status | lower == 'ok' or (opn_zfs_snapshot_ignore_error | bool)
+    msg: create snapshot failed
+  when: not ansible_check_mode

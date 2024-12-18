@@ -16,6 +16,9 @@ pre_reboot_delay: 0  # must be greater then 60 and will be rounded to minutes
 post_reboot_delay: 30
 reboot_throttle: 1
 
+# snapshots handling documentation:
+# https://docs.opnsense.org/manual/snapshots.html
+#
 # create a zfs snapshot before a update/upgrade
 opn_zfs_snapshot: true
 

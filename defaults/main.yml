@@ -16,4 +16,11 @@ pre_reboot_delay: 0  # must be greater then 60 and will be rounded to minutes
 post_reboot_delay: 30
 reboot_throttle: 1
 
+# create a zfs snapshot before a update/upgrade
+opn_zfs_snapshot: true
+
+# snapshot prefix and name
+# do not use whitespaces!
+opn_snapshot_prefix: opn_update_
+opn_snapshot_name: "{{ opn_snapshot_prefix }}_{{ ansible_local.opnsense.core.product_version }}"
 ...

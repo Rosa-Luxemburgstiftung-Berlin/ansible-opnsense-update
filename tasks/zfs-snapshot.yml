@@ -7,3 +7,11 @@
       - ansible_local.opnsense.zfs_snapshot.supported.status == 'OK'
     msg: "ZFS snapshots are not supported on the current system"
 
+- name: get list of existing snapshots
+  ansible.builtin.set_fact:
+    _zfs_snapshot_list: "{{ ansible_local.opnsense.zfs_snapshot.list | map(attribute='name') | list | default([]) }}"
+
+- name: debug list  of existing snapshots
+  ansible.builtin.debug:
+    var: _zfs_snapshot_list
+    verbosity: 1

@@ -24,7 +24,7 @@
     that:
       - ansible_local.opnsense.core.product_version is defined
       - ansible_local.opnsense.ansible_opnsense_facts_version is defined
-      - ansible_local.opnsense.ansible_opnsense_facts_version is version_compare('0.2', '>=')
+      - ansible_local.opnsense.ansible_opnsense_facts_version is version_compare('0.3', '>=')
   tags: always
 
 # get informations for major upgrades from pkg_upgrade fact

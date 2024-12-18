@@ -1,0 +1,12 @@
+---
+
+- name: check zfs snapshot support  # noqa no-changed-when
+  ansible.builtin.command: bectl check
+  failed_when: false
+  register: _bectl_check
+
+- name: report error - boot environments are NOT supported on the current system.
+  fail:
+    msg: boot environments are NOT supported on the current system.
+  when: _bectl_check.rc | int > 0
+

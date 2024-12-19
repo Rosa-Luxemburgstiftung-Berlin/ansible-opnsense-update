@@ -24,7 +24,7 @@
     that:
       - ansible_local.opnsense.core.product_version is defined
       - ansible_local.opnsense.ansible_opnsense_facts_version is defined
-      - ansible_local.opnsense.ansible_opnsense_facts_version is version_compare('0.2', '>=')
+      - ansible_local.opnsense.ansible_opnsense_facts_version is version_compare('0.3', '>=')
   tags: always
 
 # get informations for major upgrades from pkg_upgrade fact
@@ -125,6 +125,25 @@
   when:
     - _opn_update_desired_version_unified is defined
     - _opn_update_desired_version_unified is version_compare(_opn_current_version, '>')
+
+- name: prepare zfs snapshots ...
+  ansible.builtin.include_tasks: zfs-snapshot.yml
+  when:
+    - (opn_zfs_snapshot_delete_existing | bool) or (opn_zfs_snapshot | bool)
+
+- name: delete zfs snapshots ...
+  ansible.builtin.include_tasks: zfs-snapshot-delete.yml
+  with_items: "{{ _zfs_snapshot_list_delete | default([]) }}"
+  loop_control:
+    loop_var: snapshot2delete
+  when:
+    - ((opn_zfs_snapshot_delete_existing | bool) and (_opn_update_required | default(false) | bool)) or (opn_zfs_snapshot_delete_existing_always | bool)
+
+- name: create zfs snapshot before update ...
+  ansible.builtin.include_tasks: zfs-snapshot-create.yml
+  when:
+    - _opn_update_required | default(false) | bool
+    - opn_zfs_snapshot | bool
 
 - name: prepare update ...
   ansible.builtin.include_tasks: update.yml

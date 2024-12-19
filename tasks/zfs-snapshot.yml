@@ -1,0 +1,20 @@
+---
+
+- name: check zfs snapshot support  # noqa no-changed-when
+  ansible.builtin.assert:
+    that:
+      - ansible_local.opnsense.zfs_snapshot.supported.status is defined
+      - ansible_local.opnsense.zfs_snapshot.supported.status | upper == 'OK'
+    msg: "ZFS snapshots are not supported on the current system"
+
+- name: get list of existing snapshots
+  ansible.builtin.set_fact:
+    _zfs_snapshot_list: "{{ ansible_local.opnsense.zfs_snapshot.list | map(attribute='name') | list | default([]) }}"
+    _zfs_snapshot_list_delete: "{{ ansible_local.opnsense.zfs_snapshot.list | selectattr('active', 'equalto', '-') | selectattr('mountpoint', 'equalto', '-') | selectattr('name', 'search', '^'~opn_snapshot_prefix) | map(attribute='name') | list | default([]) }}"
+
+- name: debug lists of existing snapshots
+  ansible.builtin.debug:
+    msg:
+      - "_zfs_snapshot_list: {{ _zfs_snapshot_list }}"
+      - "_zfs_snapshot_list_delete: {{ _zfs_snapshot_list_delete }}"
+    verbosity: 1

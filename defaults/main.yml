@@ -16,4 +16,21 @@ pre_reboot_delay: 0  # must be greater then 60 and will be rounded to minutes
 post_reboot_delay: 30
 reboot_throttle: 1
 
-...
+# snapshots handling documentation:
+# https://docs.opnsense.org/manual/snapshots.html
+#
+# create a zfs snapshot before a update/upgrade
+opn_zfs_snapshot: true
+
+# ignore errors on snapshot creation or deletion
+opn_zfs_snapshot_ignore_error: false
+
+# delete old snapshots that have the configured prefix before a update/upgrade
+opn_zfs_snapshot_delete_existing: true
+# delete old snapshots that have the configured prefix always
+opn_zfs_snapshot_delete_existing_always: false
+
+# snapshot prefix and name
+# do not use whitespaces!
+opn_snapshot_prefix: opn_update_
+opn_snapshot_name: "{{ opn_snapshot_prefix }}_{{ ansible_local.opnsense.core.product_version }}"

@@ -85,7 +85,7 @@ ansible-playbook -e opn_pkg_upgrade=true ...
 This can be run as a extra step or direct after a update/upgrade (combining `-e opn_pkg_upgrade=true` and `-e opn_update=true`)
 
 
-### zdf snapshots
+### zfs snapshots
 
 The role can create zfs snapshots before running a update/upgrade.
 Use var `opn_zfs_snapshot: true` (default).

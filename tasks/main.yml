@@ -137,7 +137,7 @@
   loop_control:
     loop_var: snapshot2delete
   when:
-    - opn_zfs_snapshot_delete_existing | bool
+    - ((opn_zfs_snapshot_delete_existing | bool) and (_opn_update_required | default(false) | bool)) or (opn_zfs_snapshot_delete_existing_always | bool)
 
 - name: create zfs snapshot before update ...
   ansible.builtin.include_tasks: zfs-snapshot-create.yml

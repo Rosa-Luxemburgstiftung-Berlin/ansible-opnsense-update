@@ -25,8 +25,10 @@ opn_zfs_snapshot: true
 # ignore errors on snapshot creation or deletion
 opn_zfs_snapshot_ignore_error: false
 
-# delete old snapshots that have the configured prefix
+# delete old snapshots that have the configured prefix before a update/upgrade
 opn_zfs_snapshot_delete_existing: true
+# delete old snapshots that have the configured prefix always
+opn_zfs_snapshot_delete_existing_always: false
 
 # snapshot prefix and name
 # do not use whitespaces!

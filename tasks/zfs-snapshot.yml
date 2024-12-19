@@ -10,10 +10,13 @@
 - name: get list of existing snapshots
   ansible.builtin.set_fact:
     _zfs_snapshot_list: "{{ ansible_local.opnsense.zfs_snapshot.list | map(attribute='name') | list | default([]) }}"
+    _zfs_snapshot_list_delete: "{{ ansible_local.opnsense.zfs_snapshot.list | selectattr('active', 'equalto', '-') | selectattr('mountpoint', 'equalto', '-') | selectattr('name', 'search', '^'~opn_snapshot_prefix) | map(attribute='name') | list | default([]) }}"
 
-- name: debug list  of existing snapshots
+- name: debug lists of existing snapshots
   ansible.builtin.debug:
-    var: _zfs_snapshot_list
+    msg:
+      - "_zfs_snapshot_list: {{ _zfs_snapshot_list }}"
+      - "_zfs_snapshot_list_delete: {{ _zfs_snapshot_list_delete }}"
     verbosity: 1
 
 - name: create snapshot

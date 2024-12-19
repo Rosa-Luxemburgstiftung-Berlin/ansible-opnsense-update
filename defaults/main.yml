@@ -22,6 +22,12 @@ reboot_throttle: 1
 # create a zfs snapshot before a update/upgrade
 opn_zfs_snapshot: true
 
+# ignore errors on snapshot creation
+opn_zfs_snapshot_ignore_error: false
+
+# delete old snapshots that have the configured prefix
+opn_zfs_snapshot_delete_existing: true
+
 # snapshot prefix and name
 # do not use whitespaces!
 opn_snapshot_prefix: opn_update_

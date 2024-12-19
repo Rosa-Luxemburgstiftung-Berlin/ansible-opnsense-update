@@ -1,0 +1,19 @@
+---
+- name: delete snapshot {{ snapshot2delete }}  # noqa no-changed-when
+  ansible.builtin.command: "configctl zfs snapshot destroy {{ snapshot2delete }}"
+  register: _zfs_snapshot_destroy
+
+- name: ... parse output
+  ansible.builtin.set_fact:
+    _zfs_snapshot_destroy_status: "{{ _zfs_snapshot_destroy.stdout | from_json }}"
+  when: not ansible_check_mode
+
+- name: print output of delete snapshot {{ snapshot2delete }}
+  ansible.builtin.debug:
+    var: _zfs_snapshot_destroy_status
+
+- name: assert snapshot {{ snapshot2delete }} was deleted
+  ansible.builtin.assert:
+    that: _zfs_snapshot_destroy_status.status | lower == 'ok' or (opn_zfs_snapshot_ignore_error | bool)
+    msg: delete snapshot {{ snapshot2delete }} failed
+  when: not ansible_check_mode

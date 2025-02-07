@@ -93,7 +93,7 @@ Use var `opn_zfs_snapshot: true` (default).
 Default naming convention for snapshots is `opn_update__$CURRENT_OPNSENSE_VERSION$`.
 
 Existing snapshots from previous runs can be removed.
-Ue var `opn_zfs_snapshot_delete_existing: true` (default).
+Use var `opn_zfs_snapshot_delete_existing: true` (default).
 
 ## Notes
 

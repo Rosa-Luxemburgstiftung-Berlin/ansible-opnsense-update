@@ -75,6 +75,7 @@
     - ansible_local.opnsense.pkg_upgrade
     - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages is defined
     - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'in', [ansible_local.opnsense.core.product_id, 'base'])
 
 - name: debug _core_upgrade_packages
   ansible.builtin.debug:

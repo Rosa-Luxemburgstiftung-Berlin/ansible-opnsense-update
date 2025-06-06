@@ -23,7 +23,7 @@
   ansible.builtin.set_fact:
     _opn_major_update: "{{ _opn_check_major_update.stdout_lines | length > 0 }}"
   when:
-    - _opn_major_update is undefined or not _opn_major_update
+    - _opn_major_update is undefined or not (_opn_major_update | bool)
 
 - name: major update require a reboot
   ansible.builtin.set_fact:
@@ -40,14 +40,14 @@
   register: _opn_check_reboot_required
   when:
     - _opn_reboot_required is not defined
-    - not _opn_major_update
+    - not (_opn_major_update | bool)
 
 - name: register reboot required status
   ansible.builtin.set_fact:
     _opn_reboot_required: "{{ not (_opn_check_reboot_required.rc | bool) }}"
   when:
     - _opn_reboot_required is not defined
-    - not _opn_major_update
+    - not (_opn_major_update | bool)
 
 - name: debug vars ...
   ansible.builtin.debug:
@@ -69,7 +69,7 @@
       {%- else -%}
         {{ opn_update_wait_for_reboot_4_minor_upgrade }}
       {%- endif -%}"
-  when: _opn_reboot_required or opn_update
+  when: (_opn_reboot_required | bool) or (opn_update | bool)
 
 - name: announce the upcoming update/upgrade
   ansible.builtin.debug:
@@ -78,8 +78,8 @@
 - name: run update  # noqa no-changed-when
   ansible.builtin.command: /usr/local/etc/rc.firmware
   when:
-    - not _opn_reboot_required
-    - not _opn_major_update
+    - not (_opn_reboot_required | bool)
+    - not (_opn_major_update | bool)
 
 - name: "run update and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
@@ -90,8 +90,8 @@
     post_reboot_delay: "{{ post_reboot_delay }}"
   throttle: "{{ reboot_throttle }}"
   when:
-    - _opn_reboot_required
-    - not _opn_major_update
+    - _opn_reboot_required | bool
+    - not (_opn_major_update | bool)
 
 - name: "run upgrade targeting {{ _opn_update_desired_base }} and reboot using a reboot_timeout of {{ _opn_reboot_timeout }}s ..."
   ansible.builtin.reboot:
@@ -101,7 +101,7 @@
     post_reboot_delay: "{{ post_reboot_delay }}"
   throttle: "{{ reboot_throttle }}"
   when:
-    - _opn_major_update
+    - _opn_major_update | bool
 
 - name: clean up old facts
   ansible.builtin.file:

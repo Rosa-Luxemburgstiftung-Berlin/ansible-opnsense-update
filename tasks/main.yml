@@ -35,9 +35,9 @@
     _opn_major_update: true
   when:
     - ansible_local.opnsense.pkg_upgrade is defined
-    - ansible_local.opnsense.pkg_upgrade
+    - ansible_local.opnsense.pkg_upgrade | length > 0
     - ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version is defined
-    - ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version
+    - not ansible_local.opnsense.pkg_upgrade[0].upgrade_major_version == ''
 
 - name: debug _opn_update_desired_base
   ansible.builtin.debug:
@@ -72,9 +72,9 @@
   when:
     - _opn_update_desired_base is not defined
     - ansible_local.opnsense.pkg_upgrade is defined
-    - ansible_local.opnsense.pkg_upgrade
+    - ansible_local.opnsense.pkg_upgrade | length > 0
     - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages is defined
-    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | length > 0
     - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'in', [ansible_local.opnsense.core.product_id, 'base'])
 
 - name: debug _core_upgrade_packages

@@ -11,6 +11,7 @@
 - name: print output of delete snapshot {{ snapshot2delete }}
   ansible.builtin.debug:
     var: _zfs_snapshot_destroy_status
+  when: not ansible_check_mode
 
 - name: assert snapshot {{ snapshot2delete }} was deleted
   ansible.builtin.assert:

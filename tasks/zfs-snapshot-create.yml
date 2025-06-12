@@ -11,6 +11,7 @@
 - name: print output of create snapshot {{ opn_snapshot_name }}
   ansible.builtin.debug:
     var: _zfs_snapshot_created_status
+  when: not ansible_check_mode
 
 - name: assert snapshot {{ opn_snapshot_name }} was created
   ansible.builtin.assert:

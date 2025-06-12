@@ -63,7 +63,7 @@
       - "{{ ansible_local.opnsense.pkg_upgrade[0].upgrade_major_message }}"
   when: _opn_update_desired_base is defined
 # END get informations for major upgrades from pkg_upgrade fact
-
+#
 # get informations for updates from pkg_upgrade fact
 - name: get next available update of core package...
   ansible.builtin.set_fact:
@@ -75,7 +75,7 @@
     - ansible_local.opnsense.pkg_upgrade | length > 0
     - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages is defined
     - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | length > 0
-    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'in', [ansible_local.opnsense.core.product_id, 'base'])
+    - ansible_local.opnsense.pkg_upgrade[0].upgrade_packages | selectattr('name', 'in', [ansible_local.opnsense.core.product_id, 'base']) | length > 0
 
 - name: debug _core_upgrade_packages
   ansible.builtin.debug:
